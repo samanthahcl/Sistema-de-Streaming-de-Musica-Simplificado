@@ -3,16 +3,7 @@ package com.spotify.factory;
 import com.spotify.model.Content;
 import com.spotify.model.Podcast;
 
-/**
- * ============================================================
- * PADRÃO: FACTORY METHOD — Criador Concreto para Podcast
- * ============================================================
- *
- * Implementa factoryMethod() instanciando especificamente
- * um objeto Podcast. Toda a lógica exclusiva de Podcast
- * (ex.: validação de número de episódio) fica isolada aqui.
- * ============================================================
- */
+
 public class PodcastCreator extends ContentCreator {
 
     private final String title;
@@ -32,10 +23,7 @@ public class PodcastCreator extends ContentCreator {
         this.description     = description;
     }
 
-    /**
-     * Implementação concreta do Factory Method.
-     * Aplica validação específica de Podcast e cria a instância.
-     */
+
     @Override
     public Content factoryMethod() {
         if (episodeNumber <= 0) {

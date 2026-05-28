@@ -1,9 +1,6 @@
 package com.spotify.model;
 
-/**
- * Representa uma faixa musical na plataforma.
- * Estende Content adicionando atributos específicos de música.
- */
+
 public class Music extends Content {
 
     private String genre;

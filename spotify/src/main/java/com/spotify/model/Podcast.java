@@ -1,9 +1,6 @@
 package com.spotify.model;
 
-/**
- * Representa um episódio de podcast na plataforma.
- * Estende Content adicionando atributos específicos de podcast.
- */
+
 public class Podcast extends Content {
 
     private final String showName;

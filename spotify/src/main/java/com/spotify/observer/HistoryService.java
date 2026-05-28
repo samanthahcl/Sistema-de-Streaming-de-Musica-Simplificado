@@ -7,12 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Observador Concreto: serviço de histórico de reprodução.
- *
- * Registra cada faixa reproduzida com timestamp, permitindo
- * consulta posterior do histórico completo.
- */
+
 public class HistoryService implements TrackObserver {
 
     private static final DateTimeFormatter TIME_FMT =
@@ -20,7 +15,6 @@ public class HistoryService implements TrackObserver {
     private static final DateTimeFormatter FULL_FMT =
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
-    /** Registro imutável de uma faixa ouvida. */
     public record HistoryEntry(String contentTitle,
                                String contentType,
                                String author,
@@ -51,12 +45,10 @@ public class HistoryService implements TrackObserver {
                 entry.playedAt().format(TIME_FMT));
     }
 
-    /** Retorna o histórico completo (somente leitura). */
     public List<HistoryEntry> getHistory() {
         return Collections.unmodifiableList(history);
     }
 
-    /** Imprime o histórico formatado no console. */
     public void printHistory() {
         System.out.printf("%n📖 Histórico de Reprodução (%d faixa(s)):%n", history.size());
         if (history.isEmpty()) {

@@ -2,12 +2,7 @@ package com.spotify.observer;
 
 import com.spotify.model.Content;
 
-/**
- * Observador Concreto: simula a interface gráfica do usuário.
- *
- * Quando notificado, exibe no console as informações da faixa
- * como se fossem atualizações na tela do aplicativo.
- */
+
 public class UIObserver implements TrackObserver {
 
     private final String displayName;
@@ -33,11 +28,7 @@ public class UIObserver implements TrackObserver {
         System.out.println("  ╚" + "═".repeat(BOX_WIDTH + 2) + "╝");
     }
 
-    /**
-     * Imprime uma linha da caixa com padding fixo à direita.
-     * Calcula o preenchimento manualmente para não depender de
-     * %-Ns, que não leva em conta a largura real dos emojis.
-     */
+
     private void printRow(String text) {
         // Emojis ocupam 2 colunas de terminal cada; ajustamos o padding
         int visualWidth = visualLength(text);
@@ -45,10 +36,7 @@ public class UIObserver implements TrackObserver {
         System.out.println("  ║ " + text + " ".repeat(padding) + " ║");
     }
 
-    /**
-     * Estima a largura visual de uma string no terminal,
-     * contando cada emoji como 2 colunas em vez de 1.
-     */
+
     private int visualLength(String s) {
         int len = 0;
         for (int i = 0; i < s.length(); ) {

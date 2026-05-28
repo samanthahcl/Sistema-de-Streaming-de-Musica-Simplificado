@@ -10,18 +10,7 @@ import com.spotify.observer.UIObserver;
 import com.spotify.strategy.RandomMode;
 import com.spotify.strategy.SequentialMode;
 
-/**
- * ============================================================
- * Classe Principal — Simulação do Sistema de Streaming
- * ============================================================
- *
- * Demonstra os três padrões GoF aplicados em conjunto:
- *
- *  ✅ Factory Method  → ContentCreator / MusicCreator / PodcastCreator
- *  ✅ Strategy        → SequentialMode / RandomMode trocados em runtime
- *  ✅ Observer        → UIObserver e HistoryService notificados pelo Player
- * ============================================================
- */
+
 public class Main {
 
     public static void main(String[] args) {
