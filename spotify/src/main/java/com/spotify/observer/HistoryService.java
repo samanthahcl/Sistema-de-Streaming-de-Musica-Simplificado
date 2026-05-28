@@ -15,14 +15,23 @@ import java.util.List;
  */
 public class HistoryService implements TrackObserver {
 
+    private static final DateTimeFormatter TIME_FMT =
+            DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final DateTimeFormatter FULL_FMT =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
     /** Registro imutável de uma faixa ouvida. */
-    public record HistoryEntry(String contentTitle, String contentType,
-                               String author, LocalDateTime playedAt) {
+    public record HistoryEntry(String contentTitle,
+                               String contentType,
+                               String author,
+                               LocalDateTime playedAt) {
         @Override
         public String toString() {
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-            return String.format("  [%s] %s — %s (%s)",
-                    playedAt.format(fmt), contentTitle, author, contentType);
+            return String.format("  [%s]  %-30s  %-18s  (%s)",
+                    playedAt.format(FULL_FMT),
+                    contentTitle,
+                    author,
+                    contentType);
         }
     }
 
@@ -39,21 +48,17 @@ public class HistoryService implements TrackObserver {
         history.add(entry);
         System.out.printf("  📋 [HistoryService] Registrado: \"%s\" às %s%n",
                 content.getTitle(),
-                entry.playedAt().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+                entry.playedAt().format(TIME_FMT));
     }
 
-    /**
-     * Retorna o histórico completo de reprodução (somente leitura).
-     */
+    /** Retorna o histórico completo (somente leitura). */
     public List<HistoryEntry> getHistory() {
         return Collections.unmodifiableList(history);
     }
 
-    /**
-     * Imprime o histórico formatado no console.
-     */
+    /** Imprime o histórico formatado no console. */
     public void printHistory() {
-        System.out.println("\n📖 Histórico de Reprodução (" + history.size() + " faixas):");
+        System.out.printf("%n📖 Histórico de Reprodução (%d faixa(s)):%n", history.size());
         if (history.isEmpty()) {
             System.out.println("  (nenhuma faixa reproduzida ainda)");
         } else {

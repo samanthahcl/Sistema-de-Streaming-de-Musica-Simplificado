@@ -11,33 +11,35 @@ import java.util.List;
 /**
  * Player — núcleo do sistema de reprodução.
  *
- * Integra três responsabilidades:
+ * Integra duas responsabilidades dos padrões GoF:
  *
  *  1. SUBJECT (Observer): mantém lista de observadores e os
- *     notifica sempre que uma faixa começa a tocar.
+ *     notifica sempre que uma nova faixa começa a tocar.
+ *     Os observadores (UIObserver, HistoryService) reagem
+ *     de forma independente, sem acoplamento ao Player.
  *
- *  2. CONTEXT (Strategy): delega ao PlaybackMode como calcular
- *     a próxima faixa, podendo trocar a estratégia em runtime.
+ *  2. CONTEXT (Strategy): delega a PlaybackMode o cálculo
+ *     do próximo índice, permitindo trocar o algoritmo de
+ *     reprodução em tempo de execução sem alterar esta classe.
  *
- *  3. CONSUMIDOR (Factory): aceita qualquer Content criado
- *     pela ContentFactory, sem depender de tipos concretos.
+ *  3. CONSUMIDOR (Factory Method): aceita qualquer Content
+ *     criado pelos creators concretos (MusicCreator,
+ *     PodcastCreator), dependendo apenas da abstração.
  */
 public class Player {
 
-    // ── Playlist ──────────────────────────────────────────────
+    // ── Playlist ─────────────────────────────────────────────
     private final List<Content> playlist = new ArrayList<>();
     private int currentIndex = -1; // -1 = nenhuma faixa ativa
 
-    // ── Strategy: modo de reprodução ─────────────────────────
+    // ── Strategy: modo de reprodução (Context) ───────────────
     private PlaybackMode playbackMode;
 
-    // ── Observer: lista de observadores ──────────────────────
+    // ── Observer: lista de observadores (Subject) ─────────────
     private final List<TrackObserver> observers = new ArrayList<>();
 
-    // ─────────────────────────────────────────────────────────
-
     public Player() {
-        this.playbackMode = new SequentialMode(); // padrão
+        this.playbackMode = new SequentialMode(); // estratégia padrão
     }
 
     // ══════════════════════════════════════════════════════════
@@ -46,9 +48,11 @@ public class Player {
 
     /** Adiciona uma faixa ao final da playlist. */
     public void addContent(Content content) {
-        if (content == null) throw new IllegalArgumentException("Conteúdo não pode ser nulo.");
+        if (content == null) {
+            throw new IllegalArgumentException("Conteúdo não pode ser nulo.");
+        }
         playlist.add(content);
-        System.out.printf("  ➕ Adicionado à playlist: %s%n", content.getTitle());
+        System.out.printf("  ➕ Adicionado: %s%n", content.getTitle());
     }
 
     /** Retorna visualização somente-leitura da playlist. */
@@ -57,28 +61,30 @@ public class Player {
     }
 
     // ══════════════════════════════════════════════════════════
-    // Strategy: troca de modo de reprodução
+    // Strategy — troca do modo de reprodução em runtime
     // ══════════════════════════════════════════════════════════
 
     /**
-     * Troca a estratégia de reprodução em tempo de execução.
-     * Nenhuma lógica condicional — apenas substitui o objeto.
+     * Substitui a estratégia de reprodução em tempo de execução.
+     * Nenhuma lógica condicional no Player — apenas troca o objeto.
      */
     public void setPlaybackMode(PlaybackMode mode) {
-        if (mode == null) throw new IllegalArgumentException("Modo não pode ser nulo.");
+        if (mode == null) {
+            throw new IllegalArgumentException("Modo de reprodução não pode ser nulo.");
+        }
         this.playbackMode = mode;
-        System.out.printf("%n  🔄 Modo de reprodução alterado para: %s%n", mode.getModeName());
+        System.out.printf("%n  🔄 Modo alterado para: %s%n", mode.getModeName());
     }
 
     public PlaybackMode getPlaybackMode() { return playbackMode; }
 
     // ══════════════════════════════════════════════════════════
-    // Observer: gerenciamento de observadores (subscribe/unsubscribe)
+    // Observer — subscribe / unsubscribe / notify
     // ══════════════════════════════════════════════════════════
 
-    /** Registra um observador para receber notificações de faixa. */
+    /** Registra um observador para receber eventos de faixa. */
     public void addObserver(TrackObserver observer) {
-        if (!observers.contains(observer)) {
+        if (observer != null && !observers.contains(observer)) {
             observers.add(observer);
         }
     }
@@ -90,10 +96,10 @@ public class Player {
 
     /**
      * Notifica TODOS os observadores registrados.
-     * O Player não sabe o que cada um fará — apenas publica o evento.
+     * O Player publica o evento sem saber o que cada um fará.
      */
     private void notifyObservers(Content content) {
-        for (TrackObserver observer : observers) {
+        for (TrackObserver observer : new ArrayList<>(observers)) {
             observer.onTrackStarted(content);
         }
     }
@@ -103,7 +109,8 @@ public class Player {
     // ══════════════════════════════════════════════════════════
 
     /**
-     * Inicia a reprodução da primeira faixa da playlist.
+     * Inicia a reprodução a partir da primeira faixa.
+     * Se já houver uma faixa tocando, reinicia do índice 0.
      */
     public void play() {
         if (playlist.isEmpty()) {
@@ -115,8 +122,8 @@ public class Player {
     }
 
     /**
-     * Avança para a próxima faixa usando a estratégia atual (Strategy).
-     * Em seguida, notifica todos os observadores (Observer).
+     * Avança para a próxima faixa delegando ao Strategy atual,
+     * depois notifica todos os observadores (Observer).
      */
     public void next() {
         if (playlist.isEmpty()) {
@@ -124,10 +131,10 @@ public class Player {
             return;
         }
         if (currentIndex < 0) {
+            // Nenhuma faixa foi iniciada ainda — começa do início
             play();
             return;
         }
-
         // Delega ao Strategy o cálculo do próximo índice
         currentIndex = playbackMode.next(playlist, currentIndex);
         playCurrentTrack();
@@ -138,18 +145,16 @@ public class Player {
      */
     private void playCurrentTrack() {
         Content current = playlist.get(currentIndex);
-        System.out.printf("%n  ▶  Reproduzindo [%d/%d] via modo %s%n",
+        System.out.printf("%n  ▶  [%d/%d] via modo %s%n",
                 currentIndex + 1, playlist.size(), playbackMode.getModeName());
 
         // Notifica observadores (Observer pattern)
         notifyObservers(current);
     }
 
-    /**
-     * Exibe todas as faixas da playlist com seus índices.
-     */
+    /** Exibe todas as faixas da playlist com seus índices. */
     public void printPlaylist() {
-        System.out.println("\n📀 Playlist (" + playlist.size() + " itens):");
+        System.out.printf("%n📀 Playlist (%d itens):%n", playlist.size());
         if (playlist.isEmpty()) {
             System.out.println("  (vazia)");
             return;
