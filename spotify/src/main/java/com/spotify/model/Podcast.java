@@ -6,21 +6,21 @@ package com.spotify.model;
  */
 public class Podcast extends Content {
 
-    private String showName;
-    private int episodeNumber;
-    private String description;
+    private final String showName;
+    private final int    episodeNumber;
+    private final String description;
 
     public Podcast(String title, String author, int durationSeconds,
                    String showName, int episodeNumber, String description) {
         super(title, author, durationSeconds);
-        this.showName = showName;
+        this.showName      = showName;
         this.episodeNumber = episodeNumber;
-        this.description = description;
+        this.description   = description;
     }
 
-    public String getShowName()    { return showName; }
-    public int getEpisodeNumber()  { return episodeNumber; }
-    public String getDescription() { return description; }
+    public String getShowName()      { return showName; }
+    public int    getEpisodeNumber() { return episodeNumber; }
+    public String getDescription()   { return description; }
 
     @Override
     public String getContentType() {
@@ -30,6 +30,7 @@ public class Podcast extends Content {
     @Override
     public String toString() {
         return super.toString()
-                + String.format(" | Show: %s | Ep. %d", showName, episodeNumber);
+                + String.format(" | Show: %s | Ep. %d | %s",
+                showName, episodeNumber, description);
     }
 }
