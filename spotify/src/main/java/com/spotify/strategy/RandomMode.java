@@ -4,12 +4,7 @@ import com.spotify.model.Content;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Estratégia Concreta: reprodução aleatória.
- *
- * Escolhe aleatoriamente a próxima faixa, garantindo que
- * não seja a mesma que a atual (quando há mais de 1 item).
- */
+
 public class RandomMode implements PlaybackMode {
 
     private final Random random;
@@ -18,15 +13,11 @@ public class RandomMode implements PlaybackMode {
         this.random = new Random();
     }
 
-    /** Construtor alternativo para testes determinísticos. */
     public RandomMode(long seed) {
         this.random = new Random(seed);
     }
 
-    /**
-     * Sorteia um índice diferente do atual.
-     * Se a playlist tiver apenas 1 item, retorna 0.
-     */
+
     @Override
     public int next(List<Content> playlist, int currentIndex) {
         if (playlist == null || playlist.isEmpty()) {
